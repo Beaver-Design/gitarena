@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- This tells IE to use most modern available mode.
+         THIS LINE MUST COME FIRST IN HEAD SECTION -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8">
+<title>GH Organizer</title>
+<style>
+    /* This rule must come first for show/hide code to work */
+    body {
+        margin: 1em;
+        padding: 0;
+        font: 13pt arial, sans-serif;
+        color: #333;
+    }
+    h1, h2, h3, h4, h5, h6, p {
+        margin: 0;
+        padding: 0;
+        line-height: 1;
+    }
+    h1, h2, h3, h4, h5, h6 { font-weight: bold; }
+    h1 { font-size: 1.728em; }
+    h2 { font-size: 1.200em; }
+    h3, h4, h5, h6 { font-size: 1.000em; }
+    #sidebar {
+        position: fixed;
+        height: 100%;
+        width: 200px;
+        background-color: #ddd;
+        top: 0;
+        left: 0;
+        overflow: scroll;
+    }
+    #sidebar select {
+        width: 160px;
+        margin: 10px;
+        padding: 3px 6px;
+        font-size: 1em;
+        font-weight: normal;
+    }
+    #content {
+        margin-left: 200px;
+    }
+    </style>
+</head>
+<body>
+<div id="sidebar">
+    <h2>Organizations</h2>
+    <select id="org">
+        {% for org in orgs %}
+        <option value="{{ org["url"] }}" selected>{{ org["login"] }}</option>
+        {% endfor %}
+    </select>
+</div>
+<div id="content">
+    <h1>Teams</h1>
+    <h1>Repositories</h1>
+    <h1>Milestones</h1>
+    <h1>Issues</h1>
+</div>
+</body>
+</html>
