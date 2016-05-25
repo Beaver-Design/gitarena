@@ -1,9 +1,5 @@
-import config
 import flask
-import json
-import os
 import sys
-import requests
 
 app = flask.Flask(__name__)
 
@@ -81,16 +77,9 @@ def formURLRepos(base, org):
 
 @app.route('/')
 def home():
-    url_orgs = formURLUserOrgs(config.URL_BASE, config.USER)
-    orgs = getRequestJson(url_orgs, config.USER, config.TOKEN, parameters = {'filter':'all'}, drill = True)
+    orgs = [{'url': 'http://www.foo.com', 'login': 'bar'},{'url': 'http://www.baz.com', 'login': 'bin'}]
     return flask.render_template('home.html', orgs = orgs)
 
 if __name__ == '__main__':
-    url_orgs = formURLUserOrgs(config.URL_BASE, config.USER)
-    orgs = getRequestJson(url_orgs, config.USER, config.TOKEN, parameters = {'filter':'all'}, drill = True)
     print('this is a test')
-    for org in orgs:
-        print(org['url'])
-    r_orgs = getRequest(url_orgs, config.USER, config.TOKEN, debug = True)
-    print(json.dumps(r_orgs.json()))
     app.run(debug='--debug' in sys.argv)
