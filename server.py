@@ -77,6 +77,7 @@ def formURLRepos(base, org):
 
 @app.route('/')
 def home():
+    print('test')
     orgs = [{'url': 'http://www.foo.com', 'login': 'bar'},{'url': 'http://www.baz.com', 'login': 'bin'}]
     return flask.render_template('home.html', orgs = orgs)
 
