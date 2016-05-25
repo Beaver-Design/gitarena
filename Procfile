@@ -1,1 +1,1 @@
-web: waitress-serve --port=18885 --threads=2 server:app
+web: bin/proximo waitress-serve --port=18885 --threads=2 server:app
