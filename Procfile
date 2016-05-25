@@ -1,1 +1,1 @@
-web: bin/proximo waitress-serve --port=$PORT server:app
+web: waitress-serve --port=$PORT server:app
