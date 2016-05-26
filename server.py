@@ -1,6 +1,6 @@
 import flask
 import sys
-
+import os
 app = flask.Flask(__name__)
 
 def getRequest(url, username, password, parameters = {}, debug = False): 
@@ -77,8 +77,9 @@ def formURLRepos(base, org):
 
 @app.route('/')
 def home():
+    test = os.environ.get('test')
     print('test')
-    orgs = [{'url': 'http://www.foo.com', 'login': 'bar'},{'url': 'http://www.baz.com', 'login': 'bin'}]
+    orgs = [{'url': 'http://www.foo.com', 'login': 'bar'},{'url': 'http://www.baz.com', 'login': test}]
     return flask.render_template('home.html', orgs = orgs)
 
 if __name__ == '__main__':
