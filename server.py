@@ -34,7 +34,8 @@ def index():
         t = 'Hello! <a href="{{ url_for("user") }}">Get user</a> ' \
             '<a href="{{ url_for("logout") }}">Logout</a>'
     else:
-        t = 'Hello! <a href="{{ url_for("login") }}">Login</a>'
+        #t = 'Hello! <a href="{{ url_for("login") }}">Login</a>'
+        t = 'Hello!'
 
     return render_template_string(t)
 
@@ -78,5 +79,4 @@ def user():
     return str(github.get('user'))
 
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True)
