@@ -1,87 +1,82 @@
 import flask
 import sys
 import os
+from flask.ext.github import GitHub
+
+github_client_id = os.environ.get('GITHUB_CLIENT_ID')
+github_client_secret = os.environ.get('GITHUB_CLIENT_SECRET')
+
 app = flask.Flask(__name__)
+app.config['GITHUB_CLIENT_ID'] = github_client_id
+app.config['GITHUB_CLIENT_SECRET'] = github_client_secret
 
-def getRequest(url, username, password, parameters = {}, debug = False): 
-    r = requests.get(url, params=parameters, auth=(username, password))
-    if debug:
-        print('Status Code: %i'%r.status_code)
-    return r
+github = GitHub(app)
 
-def getRequestJson(url, username, password, parameters = {}, debug = False, drill = False): 
-    print(url)
-    r = requests.get(url, params=parameters, auth=(username, password))
-    if debug:
-        print('Status Code: %i'%r.status_code)
-    if not drill:
-        return r.json()
-    else:
-        page_count = findPageCount(r.links)
-        if page_count == 1:
-            return r.json()
-        current_page = findCurrentPage(url)
-        if debug:
-            print('page: %i of %i'%(current_page, page_count))
-        if page_count == current_page:
-            return r.json()
-        else:
-            return r.json() + getRequestJson(r.links['next']['url'], username, password, parameters, debug, drill)
-        
-def headRequest(url, username, password, parameters = {}, debug = False): 
-    r = requests.head(url, params=parameters, auth=(username, password))
-    if degug:
-        print('Status Code: %i'%r.status_code)
-    return r
+class User(Base):
+    __tablename__ = 'users'
 
-def findPageCount(links, search = 'page=([^,]+)'):
-    if not links:
-        return 1
-    try:
-        match = re.search(search, links['last']['url'])
-        if match:
-            count = int(match.group(1))
-            return count
-        else:
-            return False
-    except KeyError:
-        print('should be the last one' + json.dumps(links))
-        match = re.search(search, links['prev']['url'])
-        if match:
-            count = int(match.group(1)) + 1
-            return count
-        else:
-            return False
+    id = Column(Integer, primary_key=True)
+    username = Column(String(200))
+    github_access_token = Column(String(200))
 
-def findCurrentPage(url, search = 'page=([^,]+)'):
-    if 'page=' in url:
-        match = re.search(search, url)
-        if match:
-            count = int(match.group(1))
-            return count
-        else:
-            return False
-    else:
-        return 1
-    
-def formURLMilestoneByRepo(base, owner, repo):
-    return '%s/repos/%s/%s/milestones'%(base, owner, repo)
-def formURLUserOrgs(base, username):
-    return "%s/users/%s/orgs"%(base, username)
-def formURLRepos(base, org):
-    return '%s/orgs/%s/repos'%(base, org)
-def formURLRepos(base, org):
-    return '%s/orgs/%s/teams'%(base, org)
-def formURLRepos(base, org):
-    return '%s/orgs/%s/issues'%(base, org)
+    def __init__(self, github_access_token):
+        self.github_access_token = github_access_token
+
+@app.before_request
+def before_request():
+    g.user = None
+    if 'user_id' in session:
+        g.user = User.query.get(session['user_id'])
 
 @app.route('/')
-def home():
-    test = os.environ.get('test')
-    print('test')
-    orgs = [{'url': 'http://www.foo.com', 'login': 'bar'},{'url': 'http://www.baz.com', 'login': test}]
-    return flask.render_template('home.html', orgs = orgs)
+def index():
+    if g.user:
+        t = 'Hello! <a href="{{ url_for("user") }}">Get user</a> ' \
+            '<a href="{{ url_for("logout") }}">Logout</a>'
+    else:
+        t = 'Hello! <a href="{{ url_for("login") }}">Login</a>'
+
+    return render_template_string(t)
+
+@github.access_token_getter
+def token_getter():
+    user = g.user
+    if user is not None:
+        return user.github_access_token
+
+@app.route('/github-callback')
+@github.authorized_handler
+def authorized(access_token):
+    next_url = request.args.get('next') or url_for('index')
+    if access_token is None:
+        return redirect(next_url)
+
+    user = User.query.filter_by(github_access_token=access_token).first()
+    if user is None:
+        user = User(access_token)
+        db_session.add(user)
+    user.github_access_token = access_token
+    db_session.commit()
+
+    session['user_id'] = user.id
+    return redirect(next_url)
+
+@app.route('/login')
+def login():
+    if session.get('user_id', None) is None:
+        return github.authorize()
+    else:
+        return 'Already logged in'
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    return redirect(url_for('index'))
+
+@app.route('/user')
+def user():
+    return str(github.get('user'))
 
 if __name__ == '__main__':
-    print('this is a test')
-    app.run(debug='--debug' in sys.argv)
+    init_db()
+    app.run(debug=True)
