@@ -15,14 +15,15 @@ git_access_token = r'https://github.com/login/oauth/access_token'
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-def random_string(size=32, chars=string.printable):
+def random_string(size=10, chars=string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
 
 @app.route('/')
 def index():
     if session.get('state', False):
-        t = '<p>Hello! {{ session["state"] }}</p>'\
-            '<a href="{{ url_for("logout") }}">Logout</a>'
+        t = '<p>Hello, you are logged in, but we have not asked GitHub who you are.</p>'\
+            '<a href="{{ url_for("logout") }}">Logout</a>'\
+            '<p>Below are the session variables.'
         for key in session:
             t = t + '<p>%s: %s</p>'%(key, session[key])
     else:
@@ -36,7 +37,7 @@ def login():
         return '%s, you are already logged in!!!'%session['state']
     else:
         session['state'] = random_string()
-        git_url = git_authorize + '?' + 'client_id='+GITHUB_CLIENT_ID + '&state=' + session['state']
+        git_url = git_authorize + '?client_id='+GITHUB_CLIENT_ID + '&state=' + session['state']
         return redirect(git_url)
 
 @app.route('/logout')
