@@ -61,8 +61,9 @@ def authorized():
         'state': session['state']
         }
         r = requests.post(git_access_token_url, data = data)
+        print(r.text)
         session['access_token'] = r.json()['access_token']
-        redirect('/')
+        return redirect('/')
 
 if __name__ == '__main__':
     app.run(debug=True)
