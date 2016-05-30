@@ -31,7 +31,7 @@ def login():
     if session.get('user_id', False):
         return '%s, you are already logged in!!!'%session['user_id']
     else:
-        git_url = git_authorize + '?' + 'client_id='+GITHUB_CLIENT_ID + '&redirect_uri=' + url_for('authorized')
+        git_url = git_authorize + '?' + 'client_id='+GITHUB_CLIENT_ID
         return redirect(git_url)
 
 @app.route('/logout')
