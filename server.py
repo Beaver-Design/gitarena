@@ -52,7 +52,7 @@ def user():
 @app.route('/github-callback')
 def authorized():
     if session.get('state', False):
-        return 'ref=%s; return= %s'%(session['state'], request.args('state'))
+        return 'ref=%s; return= %s'%(session['state'], request.args['state'])
     else:
         return 'looks like something went wrong when github sent you back...'
 
