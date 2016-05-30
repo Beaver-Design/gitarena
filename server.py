@@ -57,11 +57,11 @@ def authorized():
         data = {
         'client_id': GITHUB_CLIENT_ID,
         'client_secret': GITHUB_CLIENT_SECRET,
-        'code': settings['code'],
-        'state': settings['state']
+        'code': session['code'],
+        'state': session['state']
         }
         r = requests.post(git_access_token_url, data = data)
-        setting['access_token'] = r.json()['access_token']
+        session['access_token'] = r.json()['access_token']
         redirect('/')
 
 if __name__ == '__main__':
