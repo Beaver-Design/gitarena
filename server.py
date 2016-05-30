@@ -44,7 +44,7 @@ def user():
     return session['user_id']
 
 @app.route('/github-callback')
-def authorized(access_token):
+def authorized():
     return 'looks like github sent you back...'
 
 if __name__ == '__main__':
