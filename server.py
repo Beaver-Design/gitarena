@@ -45,19 +45,7 @@ def user():
 
 @app.route('/github-callback')
 def authorized(access_token):
-    next_url = request.args.get('next') or url_for('index')
-    if access_token is None:
-        return redirect(next_url)
-
-    user = User.query.filter_by(github_access_token=access_token).first()
-    if user is None:
-        user = User(access_token)
-        db_session.add(user)
-    user.github_access_token = access_token
-    db_session.commit()
-
-    session['user_id'] = user.id
-    return redirect(next_url)
+    return 'looks like github sent you back...'
 
 if __name__ == '__main__':
     app.run(debug=True)
