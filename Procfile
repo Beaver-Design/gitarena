@@ -1,1 +1,1 @@
-web: waitress-serve --port=$PORT example:app
+web: waitress-serve --port=$PORT server:app
