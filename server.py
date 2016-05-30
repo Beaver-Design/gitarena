@@ -47,5 +47,9 @@ def user():
 def authorized():
     return 'looks like github sent you back...'
 
+@app.route('/github-callback_test')
+def github-callback_test():
+    return 'looks like this is a test...'
+
 if __name__ == '__main__':
     app.run(debug=True)
