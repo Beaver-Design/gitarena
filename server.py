@@ -1,16 +1,17 @@
-from flask import Flask, session, url_for, redirect, flash, request
+from flask import Flask, session, url_for, redirect, flash, request, abort
 from flask import render_template_string
 import sys
 import os
 import string, random
+import requests
 
 GITHUB_CLIENT_ID = os.environ.get('GITHUB_CLIENT_ID')
 GITHUB_CLIENT_SECRET = os.environ.get('GITHUB_CLIENT_SECRET')
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG')
 
-git_authorize = r'https://github.com/login/oauth/authorize'
-git_access_token = r'https://github.com/login/oauth/access_token'
+git_authorize_url = r'https://github.com/login/oauth/authorize'
+git_access_token_url = r'https://github.com/login/oauth/access_token'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -18,6 +19,7 @@ app.config.from_object(__name__)
 def random_string(size=10, chars=string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
 
+###############################################################################
 @app.route('/')
 def index():
     if session.get('state', False):
@@ -34,10 +36,10 @@ def index():
 @app.route('/login')
 def login():
     if session.get('state', False):
-        return '%s, you are already logged in!!!'%session['state']
+        redirect('/')
     else:
         session['state'] = random_string()
-        git_url = git_authorize + '?client_id='+GITHUB_CLIENT_ID + '&state=' + session['state']
+        git_url = git_authorize_url + '?client_id='+GITHUB_CLIENT_ID + '&state=' + session['state']
         return redirect(git_url)
 
 @app.route('/logout')
@@ -45,16 +47,22 @@ def logout():
     session.pop('state')
     return redirect('/')
 
-@app.route('/user')
-def user():
-    return session['user_id']
-
 @app.route('/github-callback')
 def authorized():
-    if session.get('state', False):
-        return 'ref=%s; return= %s'%(session['state'], request.args['state'])
+    if request.args['state'] != session['state']:
+        print('There is evidence a third party has intercepted your request. Restart Session!!!')
+        abort(500)
     else:
-        return 'looks like something went wrong when github sent you back...'
+        session['code'] = request.args['code']
+        data = {
+        'client_id': GITHUB_CLIENT_ID,
+        'client_secret': GITHUB_CLIENT_SECRET,
+        'code': settings['code'],
+        'state': settings['state']
+        }
+        r = requests.post(git_access_token_url, data = data)
+        setting['access_token'] = r.json()['access_token']
+        redirect('/')
 
 if __name__ == '__main__':
     app.run(debug=True)
