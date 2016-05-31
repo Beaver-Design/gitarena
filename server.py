@@ -40,7 +40,10 @@ def login():
         redirect('/')
     else:
         session['state'] = random_string()
-        git_url = git_authorize_url + '?client_id='+GITHUB_CLIENT_ID + '&state=' + session['state']
+        git_url = git_authorize_url 
+        git_url += '?client_id='+GITHUB_CLIENT_ID 
+        git_url += '&state=' + session['state']
+        git_url += '&scope=read:org' 
         return redirect(git_url)
 
 @app.route('/logout')
