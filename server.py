@@ -1,5 +1,5 @@
-from flask import Flask, session, url_for, redirect, flash, request, abort
-from flask import render_template_string
+from flask import Flask, session, url_for, redirect, request, abort
+from flask import render_template_string, render_template
 import sys
 import os
 import string, random
