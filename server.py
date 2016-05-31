@@ -60,6 +60,8 @@ def authorized():
         'code': session['code'],
         'state': session['state']
         }
+        print('json data: %s'%json.dumps(data))
+        print('url: %s'%git_access_token_url)
         r = requests.post(git_access_token_url, data = data, headers={'Content-Type': 'application/json', 'Accept': 'application/json'})
         print('Here is the text: %s'%r.text)
         session['access_token'] = r.json()['access_token']
