@@ -68,7 +68,18 @@ def authorized():
         r = requests.post(git_access_token_url, data = data, headers={'Accept': 'application/json'})
         print('Here is the text: %s'%r.text)
         session['access_token'] = r.json()['access_token']
-        return redirect('/')
+        return redirect(url_for('home'))
+
+@app.rount('/control_room')
+def home():
+    r = requests.get(r'https://api.github.com/user', headers={
+        'Content-Type': 'application/json', 
+        'Authorization': 'token %s'%session['access_token']
+        })
+    data = {}
+    data['login'] = r.json()['login']}
+    data['orgs'] = [{'login':'foo'}, {'login': 'bar'}]
+    return render_template('home.html', data = data)    
 
 if __name__ == '__main__':
     app.run(debug=True)

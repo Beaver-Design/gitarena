@@ -46,10 +46,12 @@
 </head>
 <body>
 <div id="sidebar">
+    <h1>Welcome to GitArena</h1>
+    <h1>{{ %data["login"]% }}</h1>
     <h2>Organizations</h2>
     <select id="org">
-        {% for org in orgs %}
-        <option value="{{ org["url"] }}" selected>{{ org["login"] }}</option>
+        {% for org in data["orgs"] %}
+        <option value="{{ org["login"] }}" selected>{{ org["login"] }}</option>
         {% endfor %}
     </select>
 </div>
