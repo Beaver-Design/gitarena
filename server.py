@@ -60,7 +60,7 @@ def authorized():
         'code': session['code'],
         'state': session['state']
         }
-        r = requests.post(git_access_token_url, data = data)
+        r = requests.post(git_access_token_url, data = data, headers={'Content-Type': 'application/json'})
         print(r.text)
         session['access_token'] = r.json()['access_token']
         return redirect('/')
