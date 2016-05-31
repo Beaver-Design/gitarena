@@ -4,6 +4,7 @@ import sys
 import os
 import string, random
 import requests
+import json
 
 GITHUB_CLIENT_ID = os.environ.get('GITHUB_CLIENT_ID')
 GITHUB_CLIENT_SECRET = os.environ.get('GITHUB_CLIENT_SECRET')
@@ -44,7 +45,9 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.pop('state')
+    keys = list(session.keys())
+    for key in keys:
+        session.pop(key)
     return redirect('/')
 
 @app.route('/github-callback')
@@ -62,7 +65,7 @@ def authorized():
         }
         print('json data: %s'%json.dumps(data))
         print('url: %s'%git_access_token_url)
-        r = requests.post(git_access_token_url, data = data, headers={'Content-Type': 'application/json', 'Accept': 'application/json'})
+        r = requests.post(git_access_token_url, data = data, headers={'Accept': 'application/json'})
         print('Here is the text: %s'%r.text)
         session['access_token'] = r.json()['access_token']
         return redirect('/')
