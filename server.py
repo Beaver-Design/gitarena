@@ -84,6 +84,15 @@ def user():
         'Authorization': 'token %s'%session['access_token']
         })
     return r.json()['login']
+
+@app.route('/orgs')
+def orgs():
+    r = requests.get(r'https://api.github.com/user/orgs', headers={
+        'Content-Type': 'application/json', 
+        'Authorization': 'token %s'%session['access_token']
+        })
+    return [org['login'] for org in r.json()]
+
     
 if __name__ == '__main__':
     app.run(debug=True)
