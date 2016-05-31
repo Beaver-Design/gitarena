@@ -47,13 +47,14 @@
 <body>
 <div id="sidebar">
     <h1>Welcome to GitArena</h1>
-    <h1>{{ data["login"] }}</h1>
+    <h1>username here</h1>
     <h2>Organizations</h2>
     <select id="org">
         {% for org in data["orgs"] %}
         <option value="{{ org["login"] }}" selected>{{ org["login"] }}</option>
         {% endfor %}
     </select>
+    <a href="{{ data["url_for_logout"] }}>logout</a>
 </div>
 <div id="content">
     <h1>Teams</h1>

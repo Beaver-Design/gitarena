@@ -72,14 +72,18 @@ def authorized():
 
 @app.route('/control_room')
 def home():
+    data = {}
+    data['orgs'] = [{'login':'foo'}, {'login': 'bar'}]
+    data['url_logout'] = url_for('logout')
+    return render_template('home.html', data = data)   
+
+@app.route('/user')
+def user():
     r = requests.get(r'https://api.github.com/user', headers={
         'Content-Type': 'application/json', 
         'Authorization': 'token %s'%session['access_token']
         })
-    data = {}
-    data['login'] = r.json()['login']
-    data['orgs'] = [{'login':'foo'}, {'login': 'bar'}]
-    return render_template('home.html', data = data)    
-
+    return r.json()['login']
+    
 if __name__ == '__main__':
     app.run(debug=True)
