@@ -96,7 +96,7 @@ def orgs():
         })
     return str([org['login'] for org in r.json()])
 
-@app.route('/orgs/<str:org>/teams')
+@app.route('/orgs/<org>/teams')
 def org_teams(org):
     r = requests.get(r'https://api.github.com/orgs/%s/teams'%org, headers={
         'Content-Type': 'application/json', 
