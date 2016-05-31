@@ -96,6 +96,14 @@ def orgs():
         })
     return str([org['login'] for org in r.json()])
 
+@app.route('/orgs/<str:org>/teams')
+def org_teams():
+    r = requests.get(r'https://api.github.com/orgs/%s/teams'%org, headers={
+        'Content-Type': 'application/json', 
+        'Authorization': 'token %s'%session['access_token']
+        })
+    return r.text
+
     
 if __name__ == '__main__':
     app.run(debug=True)
