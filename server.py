@@ -70,14 +70,14 @@ def authorized():
         session['access_token'] = r.json()['access_token']
         return redirect(url_for('home'))
 
-@app.rount('/control_room')
+@app.route('/control_room')
 def home():
     r = requests.get(r'https://api.github.com/user', headers={
         'Content-Type': 'application/json', 
         'Authorization': 'token %s'%session['access_token']
         })
     data = {}
-    data['login'] = r.json()['login']}
+    data['login'] = r.json()['login']
     data['orgs'] = [{'login':'foo'}, {'login': 'bar'}]
     return render_template('home.html', data = data)    
 
