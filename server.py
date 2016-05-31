@@ -94,7 +94,7 @@ def orgs():
         'Content-Type': 'application/json', 
         'Authorization': 'token %s'%session['access_token']
         })
-    return [org['login'] for org in r.json()]
+    return str([org['login'] for org in r.json()])
 
     
 if __name__ == '__main__':
