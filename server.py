@@ -25,10 +25,28 @@ def gen_header(access_token):
     'Content-Type': 'application/json', 
     'Authorization': 'token %s'%access_token
     }
+def logged_in(session = session):
+    if session.get('logged_in', False) and session['logged_in']:
+        return True
+    else:
+        return False
+
+def form_git_authorize_url(base = git_authorize_url, id = GITHUB_CLIENT_ID, session = session, scope = 'read:org'):
+    url = '%s?client_id=%s&state=%s&scope=%s'%(base, id, session['state'], scope)
+    return url
 ###############################################################################
+@app.before_first_request
+def set_github_access_token():
+    dev_access_token = os.environ.get('GITHUB_ACCESS_TOKEN')
+    dev_logged_in_status = os.environ.get('LOGGED_IN')
+    print(dev_access_token)
+    session['access_token'] = dev_access_token
+    session['std_header'] = gen_header(session['access_token'])
+    session['logged_in'] = dev_logged_in_status
+
 @app.route('/')
 def index():
-    if session.get('state', False):
+    if logged_in():
         t = '<p>Hello, you are logged in, but we have not asked GitHub who you are.</p>'\
             '<a href="{{ url_for("logout") }}">Logout</a>'\
             '<p>Below are the session variables.'
@@ -36,20 +54,19 @@ def index():
             t = t + '<p>%s: %s</p>'%(key, session[key])
     else:
         t = 'Hello! <a href="{{ url_for("login") }}">Login</a>'
+        for key in session:
+            t = t + '<p>%s: %s</p>'%(key, session[key])
 
     return render_template_string(t)
 
 @app.route('/login')
 def login():
-    if session.get('state', False):
+    if logged_in():
         redirect('/')
     else:
         session['state'] = random_string()
-        git_url = git_authorize_url 
-        git_url += '?client_id='+GITHUB_CLIENT_ID 
-        git_url += '&state=' + session['state']
-        git_url += '&scope=read:org' 
-        return redirect(git_url)
+        url = form_git_authorize_url()
+        return redirect(url)
 
 @app.route('/logout')
 def logout():
@@ -77,10 +94,13 @@ def authorized():
         print('Here is the text: %s'%r.text)
         session['access_token'] = r.json()['access_token']
         session['std_header'] = gen_header(session['access_token'])
+        session['logged_in'] = True
         return redirect(url_for('home'))
 
 @app.route('/control_room')
 def home():
+    if not logged_in():
+        return redirect('/')
     data = {}
     data['orgs'] = [{'login':'foo'}, {'login': 'bar'}]
     data['url_logout'] = url_for('logout')
@@ -88,25 +108,24 @@ def home():
 
 @app.route('/user')
 def user():
+    if not logged_in():
+        return redirect('/')
     r = requests.get(r'https://api.github.com/user', headers=session['std_header'])
     return r.text
 
 @app.route('/orgs')
 def orgs():
+    if not logged_in():
+        return redirect('/')    
     r = requests.get(r'https://api.github.com/user/orgs', headers=session['std_header'])
     return r.text
 
 @app.route('/orgs/<org>/teams')
 def org_teams(org):
+    if not logged_in():
+        return redirect('/')
     r = requests.get(r'https://api.github.com/orgs/%s/teams'%org, headers=session['std_header'])
     return r.text
-
-@app.before_first_request
-def set_github_access_token():
-    dev_access_token = os.environ.get('GITHUB_ACCESS_TOKEN')
-    print(dev_access_token)
-    session['access_token'] = dev_access_token
-    session['std_header'] = gen_header(session['access_token'])
 
 if __name__ == '__main__':
     app.run(debug=True)
