@@ -45,20 +45,55 @@
     </style>
 </head>
 <body>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script type="text/javascript">
+var orgs = ["org_foo", "org_bar"];
+function update(list, id, key){
+    var select = document.getElementById(id);
+    for (i = 0; i < list.length; i++) {
+        option = document.createElement("option");
+        option.value = i;
+        option.innerHTML = list[i][key];
+        select.appendChild(option);
+    };
+};
+function update_inner(id, value) {
+    var element = document.getElementById(id);
+    element.innerHTML = value;
+};
+$(document).ready(function(){
+    $.ajax({
+        url: '/user',
+        method: "GET",
+        success: function(result){
+            var user_data = JSON.parse(result);
+            console.log(user_data);
+            update_inner("user", user_data["login"]);
+        }
+    });
+    $.ajax({
+        url: '/orgs',
+        method: "GET",
+        success: function(result){
+            var org_data = JSON.parse(result);
+            console.log(org_data);
+            update(org_data, "orgs", "login");
+        }
+    });
+    
+});
+</script>
 <div id="sidebar">
-    <h1>Welcome to GitArena</h1>
-    <h1>username here</h1>
+    <h1>GitArena</h1>
+    <h2 id="user"></h1>
     <h2>Organizations</h2>
-    <select id="org">
-        {% for org in data["orgs"] %}
-        <option value="{{ org["login"] }}" selected>{{ org["login"] }}</option>
-        {% endfor %}
+    <select id="orgs">
     </select>
-    <a href="{{ data["url_logout"] }}">logout</a>
+    <a href="/logout">logout</a>
 </div>
 <div id="content">
     <h1>Teams</h1>
-    <h1>Repositories</h1>
+    <h1>Repositories</h1> 
     <h1>Milestones</h1>
     <h1>Issues</h1>
 </div>

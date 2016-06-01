@@ -20,6 +20,11 @@ app.config.from_object(__name__)
 def random_string(size=10, chars=string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
 
+def gen_header(access_token):
+    return {
+    'Content-Type': 'application/json', 
+    'Authorization': 'token %s'%access_token
+    }
 ###############################################################################
 @app.route('/')
 def index():
@@ -71,6 +76,7 @@ def authorized():
         r = requests.post(git_access_token_url, data = data, headers={'Accept': 'application/json'})
         print('Here is the text: %s'%r.text)
         session['access_token'] = r.json()['access_token']
+        session['std_header'] = gen_header(session['access_token'])
         return redirect(url_for('home'))
 
 @app.route('/control_room')
@@ -82,27 +88,27 @@ def home():
 
 @app.route('/user')
 def user():
-    r = requests.get(r'https://api.github.com/user', headers={
-        'Content-Type': 'application/json', 
-        'Authorization': 'token %s'%session['access_token']
-        })
-    return r.json()['login']
+    r = requests.get(r'https://api.github.com/user', headers=session['std_header'])
+    return r.text
 
 @app.route('/orgs')
 def orgs():
-    r = requests.get(r'https://api.github.com/user/orgs', headers={
-        'Content-Type': 'application/json', 
-        'Authorization': 'token %s'%session['access_token']
-        })
-    return str([org['login'] for org in r.json()])
+    r = requests.get(r'https://api.github.com/user/orgs', headers=session['std_header'])
+    return r.text
 
 @app.route('/orgs/<org>/teams')
 def org_teams(org):
-    r = requests.get(r'https://api.github.com/orgs/%s/teams'%org, headers={
-        'Content-Type': 'application/json', 
-        'Authorization': 'token %s'%session['access_token']
-        })
+    r = requests.get(r'https://api.github.com/orgs/%s/teams'%org, headers=session['std_header'])
     return r.text
+
+@app.before_first_request
+def set_github_access_token():
+    dev_access_token = os.environ.get('GITHUB_ACCESS_TOKEN')
+    print(dev_access_token)
+    session['access_token'] = dev_access_token
+    session['std_header'] = gen_header(session['access_token'])
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+   
