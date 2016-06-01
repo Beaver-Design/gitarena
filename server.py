@@ -42,8 +42,10 @@ def set_github_access_token():
     print(dev_access_token)
     session['access_token'] = dev_access_token
     session['std_header'] = gen_header(session['access_token'])
-    session['logged_in'] = dev_logged_in_status
-
+    if dev_logged_in_status == "False":
+        session['logged_in'] = False
+    else: 
+        session['logged_in'] = True
 @app.route('/')
 def index():
     if logged_in():
