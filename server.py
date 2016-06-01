@@ -38,7 +38,7 @@ def form_git_authorize_url(base = git_authorize_url, id = GITHUB_CLIENT_ID, sess
 @app.before_first_request
 def set_github_access_token():
     dev_access_token = os.environ.get('GITHUB_ACCESS_TOKEN')
-    dev_logged_in_status = bool(os.environ.get('LOGGED_IN'))
+    dev_logged_in_status = os.environ.get('LOGGED_IN')
     print(dev_access_token)
     session['access_token'] = dev_access_token
     session['std_header'] = gen_header(session['access_token'])
@@ -46,6 +46,7 @@ def set_github_access_token():
         session['logged_in'] = False
     else: 
         session['logged_in'] = True
+
 @app.route('/')
 def index():
     if logged_in():
