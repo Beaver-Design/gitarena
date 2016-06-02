@@ -64,8 +64,10 @@ function update(list, id, key, type){
 function gen_list(list, key){
     var htmlText = "";
     for (i = 0; i < list.length; i++) {
-        htmlText += '<li><label><input id ="toggle-acceptable" type="checkbox">';
-        htmlText += list[i][key] + '</label></li>';
+        var value=list[i][key]
+        htmlText += '<li id="li_' + value.split(' ').join('_') + '"">';
+        htmlText += '<label><input id ="'+ value.split(' ').join('_') + '" type="checkbox">';
+        htmlText += value + '</label></li>';
     };
     return htmlText
 };
@@ -89,8 +91,36 @@ $(document).ready(function(){
         success: function(result){
             var org_data = JSON.parse(result);
             console.log(org_data);
-            htmlText=gen_list(org_data, "login");
-            $("#orgs").append(htmlText)
+            var htmlText=gen_list(org_data, "login");
+            $("#orgs").append(htmlText);
+
+        }
+    });
+});
+//let user select an organization, then update the list of teams for that
+//organization.
+$(document).on("click", "input:checkbox", function() {
+    var checked=$(this).is(":checked");
+    if(!checked)
+        var blue=true;
+    if(checked)
+        var blue=false
+    var org=$(this).attr('id');
+    console.log("organization clicked: " + org);
+    $.ajax({
+        url: "/orgs/" + org + "/teams",
+        method: "GET",
+        success: function(result){
+            var team_data = JSON.parse(result);
+            console.log(team_data);
+            var htmlText=gen_list(team_data, 'name')
+            if(checked)
+                $("#teams").append(htmlText)
+            if(!checked)
+                for(i = 0; i < team_data.length; i++) {
+                    var value=team_data[i]['name']
+                    $("#li_" + value.split(' ').join('_')).remove()
+                };
         }
     });
 });
@@ -99,13 +129,16 @@ $(document).ready(function(){
     <h1>GitArena</h1>
     <h2 id="user"></h1>
     <h2>Organizations</h2>
-    <ul id="orgs">
+    <ul id="orgs" style="padding-left: 20px">
     </ul>
-    <a href="/logout">logout</a>
+    <div align="center"><a href="/logout">logout</a></div>
 </div>
 <div id="content">
     <h1>Teams</h1>
+    <ul id='teams'>
+    </ul>
     <h1>Repositories</h1> 
+    <h1>Labels</h1>
     <h1>Milestones</h1>
     <h1>Issues</h1>
 </div>
