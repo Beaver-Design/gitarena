@@ -61,7 +61,7 @@ function update(list, id, key, type){
         select.appendChild(option);
     };
 };
-function update_test(list, key){
+function gen_list(list, key){
     var htmlText = "";
     for (i = 0; i < list.length; i++) {
         htmlText += '<li><label><input id ="toggle-acceptable" type="checkbox">';
@@ -89,9 +89,8 @@ $(document).ready(function(){
         success: function(result){
             var org_data = JSON.parse(result);
             console.log(org_data);
-            update(org_data, "orgs", "login", "option");
-            htmlText=update_test(org_data, "login");
-            $("#id_box").append(htmlText)
+            htmlText=gen_list(org_data, "login");
+            $("#orgs").append(htmlText)
         }
     });
 });
@@ -100,9 +99,7 @@ $(document).ready(function(){
     <h1>GitArena</h1>
     <h2 id="user"></h1>
     <h2>Organizations</h2>
-    <select id="orgs">
-    </select>
-    <ul id="id_box">
+    <ul id="orgs">
     </ul>
     <a href="/logout">logout</a>
 </div>
