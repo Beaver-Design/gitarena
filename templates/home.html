@@ -23,6 +23,9 @@
     h1 { font-size: 1.728em; }
     h2 { font-size: 1.200em; }
     h3, h4, h5, h6 { font-size: 1.000em; }
+    ul {
+        list-style-type: none;
+    }
     #sidebar {
         position: fixed;
         height: 100%;
@@ -45,6 +48,7 @@
     </style>
 </head>
 <body>
+
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script type="text/javascript">
 var orgs = ["org_foo", "org_bar"];
@@ -88,6 +92,11 @@ $(document).ready(function(){
     <h2>Organizations</h2>
     <select id="orgs">
     </select>
+    <ul>
+        <li><label><input id ="toggle-acceptable" type="checkbox">foo</label></li>
+        <li><label><input id ="toggle-acceptable" type="checkbox">bar</label></li>
+        <li><label><input id ="toggle-acceptable" type="checkbox">baz</label></li>
+    </ul>
     <a href="/logout">logout</a>
 </div>
 <div id="content">
