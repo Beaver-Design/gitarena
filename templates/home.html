@@ -29,7 +29,7 @@
     #sidebar {
         position: fixed;
         height: 100%;
-        width: 200px;
+        width: 250px;
         background-color: #ddd;
         top: 0;
         left: 0;
@@ -43,7 +43,7 @@
         font-weight: normal;
     }
     #content {
-        margin-left: 200px;
+        margin-left: 250px;
     }
     </style>
 </head>
@@ -60,6 +60,14 @@ function update(list, id, key, type){
         option.innerHTML = list[i][key];
         select.appendChild(option);
     };
+};
+function update_test(list, key){
+    var htmlText = "";
+    for (i = 0; i < list.length; i++) {
+        htmlText += '<li><label><input id ="toggle-acceptable" type="checkbox">';
+        htmlText += list[i][key] + '</label></li>';
+    };
+    return htmlText
 };
 function update_inner(id, value) {
     var element = document.getElementById(id);
@@ -81,7 +89,9 @@ $(document).ready(function(){
         success: function(result){
             var org_data = JSON.parse(result);
             console.log(org_data);
-            update(org_data, "orgs", "login", "select");
+            update(org_data, "orgs", "login", "option");
+            htmlText=update_test(org_data, "login");
+            $("#id_box").append(htmlText)
         }
     });
 });
@@ -92,10 +102,7 @@ $(document).ready(function(){
     <h2>Organizations</h2>
     <select id="orgs">
     </select>
-    <ul>
-        <li><label><input id ="toggle-acceptable" type="checkbox">foo</label></li>
-        <li><label><input id ="toggle-acceptable" type="checkbox">bar</label></li>
-        <li><label><input id ="toggle-acceptable" type="checkbox">baz</label></li>
+    <ul id="id_box">
     </ul>
     <a href="/logout">logout</a>
 </div>
