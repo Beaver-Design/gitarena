@@ -130,6 +130,20 @@ def org_teams(org):
     r = requests.get(r'https://api.github.com/orgs/%s/teams'%org, headers=session['std_header'])
     return r.text
 
+@app.route('/orgs/<org>/repos')
+def org_repos(org):
+    if not logged_in():
+        return redirect('/')
+    r = requests.get(r'https://api.github.com/orgs/%s/repos'%org, headers=session['std_header'])
+    return r.text
+
+@app.route('/repos/<org>/<repo>/issues')
+def org_repo_issues(org, repo):
+    if not logged_in():
+        return redirect('/')
+    r = requests.get(r'https://api.github.com/repos/%s/%s/issues'%(org, repo), headers=session['std_header'])
+    return r.text
+
 if __name__ == '__main__':
     app.run(debug=True)
 
