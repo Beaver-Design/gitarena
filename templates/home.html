@@ -51,16 +51,6 @@
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script type="text/javascript">
-var orgs = ["org_foo", "org_bar"];
-function update(list, id, key, type){
-    var select = document.getElementById(id);
-    for (i = 0; i < list.length; i++) {
-        option = document.createElement(type);
-        option.value = i;
-        option.innerHTML = list[i][key];
-        select.appendChild(option);
-    };
-};
 function gen_list(list, key){
     var htmlText = "";
     for (i = 0; i < list.length; i++) {
