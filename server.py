@@ -31,7 +31,7 @@ def logged_in(session = session):
     else:
         return False
 
-def form_git_authorize_url(base = git_authorize_url, id = GITHUB_CLIENT_ID, session = session, scope = 'read:org'):
+def form_git_authorize_url(base = git_authorize_url, id = GITHUB_CLIENT_ID, session = session, scope = 'admin:org'):
     url = '%s?client_id=%s&state=%s&scope=%s'%(base, id, session['state'], scope)
     return url
 ###############################################################################
@@ -144,7 +144,12 @@ def org_repo_issues(org, repo):
     r = requests.get(r'https://api.github.com/repos/%s/%s/issues'%(org, repo), headers=session['std_header'])
     return r.text
 
+@app.route('/teams/<team>/repos')
+def team_repos(team):
+    if not logged_in():
+        return redirect('/')
+    r = requests.get(r'https://api.github.com/teams/%s/repos'%(team), headers=session['std_header'])
+    return r.text + str(r.headers)
+
 if __name__ == '__main__':
     app.run(debug=True)
-
-   

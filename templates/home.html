@@ -51,12 +51,17 @@
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script type="text/javascript">
-function gen_list(list, key){
+function format_name(name, prefix=""){
+    return prefix + name.split(' ').join('-')
+};
+function gen_list(list, key, property){
     var htmlText = "";
     for (i = 0; i < list.length; i++) {
         var value=list[i][key]
-        htmlText += '<li id="li_' + value.split(' ').join('_') + '"">';
-        htmlText += '<label><input id ="'+ value.split(' ').join('_') + '" type="checkbox">';
+        var id=list[i]['id']
+        htmlText += '<li id="' + format_name(value, 'li_') + '"">';
+        htmlText += '<label id="'+ id + '">';
+        htmlText += '<input id ="'+ format_name(value) + '" type="checkbox" itemprop="' + property + '">';
         htmlText += value + '</label></li>';
     };
     return htmlText
@@ -64,6 +69,42 @@ function gen_list(list, key){
 function update_inner(id, value) {
     var element = document.getElementById(id);
     element.innerHTML = value;
+};
+function update_org(org, checked){
+    $.ajax({
+        url: "/orgs/" + org + "/teams",
+        method: "GET",
+        success: function(result){
+            var team_data = JSON.parse(result);
+            console.log(team_data);
+            var htmlText=gen_list(team_data, "name", "team")
+            if(checked)
+                $("#teams").append(htmlText)
+            if(!checked)
+                for(i = 0; i < team_data.length; i++) {
+                    var value=team_data[i]['name']
+                    $(format_name(value, "#li_")).remove()
+                };
+        }
+    });
+};
+function update_repo(org, checked){
+    $.ajax({
+        url: "/orgs/" + org + "/repos",
+        method: "GET",
+        success: function(result){
+            var repo_data = JSON.parse(result);
+            console.log(repo_data);
+            var htmlText=gen_list(repo_data, "name", "repo")
+            if(checked)
+                $("#repos").append(htmlText)
+            if(!checked)
+                for(i = 0; i < repo_data.length; i++) {
+                    var value=repo_data[i]['name']
+                    $(format_name(value, "#li_")).remove()
+                };
+        }
+    });
 };
 $(document).ready(function(){
     $.ajax({
@@ -81,7 +122,7 @@ $(document).ready(function(){
         success: function(result){
             var org_data = JSON.parse(result);
             console.log(org_data);
-            var htmlText=gen_list(org_data, "login");
+            var htmlText=gen_list(org_data, "login", "org");
             $("#orgs").append(htmlText);
 
         }
@@ -91,28 +132,13 @@ $(document).ready(function(){
 //organization.
 $(document).on("click", "input:checkbox", function() {
     var checked=$(this).is(":checked");
-    if(!checked)
-        var blue=true;
-    if(checked)
-        var blue=false
-    var org=$(this).attr('id');
-    console.log("organization clicked: " + org);
-    $.ajax({
-        url: "/orgs/" + org + "/teams",
-        method: "GET",
-        success: function(result){
-            var team_data = JSON.parse(result);
-            console.log(team_data);
-            var htmlText=gen_list(team_data, 'name')
-            if(checked)
-                $("#teams").append(htmlText)
-            if(!checked)
-                for(i = 0; i < team_data.length; i++) {
-                    var value=team_data[i]['name']
-                    $("#li_" + value.split(' ').join('_')).remove()
-                };
-        }
-    });
+    var id=$(this).attr('id');
+    var property=$(this).attr('itemprop')
+    console.log("value clicked: " + id);
+    console.log("value property: " + property);
+    if(property=="org")
+        update_org(id, checked);
+        update_repo(id, checked);
 });
 </script>
 <div id="sidebar">
@@ -125,9 +151,11 @@ $(document).on("click", "input:checkbox", function() {
 </div>
 <div id="content">
     <h1>Teams</h1>
-    <ul id='teams'>
-    </ul>
+        <ul id='teams'>
+        </ul>
     <h1>Repositories</h1> 
+        <ul id='repos'>
+        </ul>
     <h1>Labels</h1>
     <h1>Milestones</h1>
     <h1>Issues</h1>
