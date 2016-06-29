@@ -45,6 +45,13 @@
     #content {
         margin-left: 250px;
     }
+    #sidebar div {
+    overflow: hidden;
+    white-space: nowrap;
+    }
+    .user_info > img, p{
+        display: inline-block;
+    }
     </style>
 </head>
 <body>
@@ -70,7 +77,7 @@ function update_inner(id, value) {
     var element = document.getElementById(id);
     element.innerHTML = value;
 };
-function update_org(org, checked){
+function update_team(org, checked){
     $.ajax({
         url: "/orgs/" + org + "/teams",
         method: "GET",
@@ -106,6 +113,9 @@ function update_repo(org, checked){
         }
     });
 };
+function update_avatar(href){
+    $("#avatar").attr("src", href);
+};
 $(document).ready(function(){
     $.ajax({
         url: '/user',
@@ -113,7 +123,9 @@ $(document).ready(function(){
         success: function(result){
             var user_data = JSON.parse(result);
             console.log(user_data);
+            update_avatar(user_data["avatar_url"]);
             update_inner("user", user_data["login"]);
+            $("#user_link").attr("href", user_data["html_url"])
         }
     });
     $.ajax({
@@ -136,14 +148,17 @@ $(document).on("click", "input:checkbox", function() {
     var property=$(this).attr('itemprop')
     console.log("value clicked: " + id);
     console.log("value property: " + property);
-    if(property=="org")
-        update_org(id, checked);
+    if(property=="org"){
+        update_team(id, checked);
         update_repo(id, checked);
+    };
 });
 </script>
 <div id="sidebar">
     <h1>GitArena</h1>
-    <h2 id="user"></h1>
+    <div id="user_info">
+        <a id="user_link"><img id="avatar" width="36"></img><p id="user" style="font-size:36px"></p></a>
+    </div>
     <h2>Organizations</h2>
     <ul id="orgs" style="padding-left: 20px">
     </ul>
