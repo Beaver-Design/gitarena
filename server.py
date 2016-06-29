@@ -31,7 +31,7 @@ def logged_in(session = session):
     else:
         return False
 
-def form_git_authorize_url(base = git_authorize_url, id = GITHUB_CLIENT_ID, session = session, scope = 'admin:org'):
+def form_git_authorize_url(base = git_authorize_url, id = GITHUB_CLIENT_ID, session = session, scope = 'read:org%20repo'):
     url = '%s?client_id=%s&state=%s&scope=%s'%(base, id, session['state'], scope)
     return url
 ###############################################################################
