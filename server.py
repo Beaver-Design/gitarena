@@ -165,5 +165,27 @@ def get_milestones(owner, repo):
     r = requests.get(r'https://api.github.com/repos/%s/%s/milestones'%(owner, repo), headers=session['std_header'])
     return r.text
 
+@app.route('/milestones')
+def get_milestones_by_orgs():
+    data = {}
+    organizations = json.loads(orgs())
+    for org in organizations:
+        login = org['login']
+        print(login)
+        repos = json.loads(org_repos(login))
+        for repo in repos:
+            name = repo['name']
+            print(' %s'%name)
+            milestones = json.loads(get_milestones(login, name))
+            for milestone in milestones:
+                title = milestone['title']
+                if title in data:
+                    data[title]['org'].append(login)
+                    data[title]['repo'].append(name)
+                else:
+                    data[title] = {'org': [login], 'repo': [name]}
+                print('  %s'%title)
+    return json.dumps(data)
+
 if __name__ == '__main__':
     app.run(debug=True)
