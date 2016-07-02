@@ -151,5 +151,19 @@ def team_repos(team):
     r = requests.get(r'https://api.github.com/teams/%s/repos'%(team), headers=session['std_header'])
     return r.text + str(r.headers)
 
+@app.route('/rate_limit')
+def get_rate_limit():
+    if not logged_in():
+        return redirect('/')
+    r = requests.get(r'https://api.github.com/rate_limit', headers=session['std_header'])
+    return r.text 
+
+@app.route('/repos/<owner>/<repo>/milestones')
+def get_milestones(owner, repo):
+    if not logged_in():
+        return redirect('/')
+    r = requests.get(r'https://api.github.com/repos/%s/%s/milestones'%(owner, repo), headers=session['std_header'])
+    return r.text
+
 if __name__ == '__main__':
     app.run(debug=True)

@@ -7,7 +7,6 @@
     <meta charset="utf-8">
 <title>GH Organizer</title>
 <style>
-    /* This rule must come first for show/hide code to work */
     body {
         margin: 1em;
         padding: 0;
@@ -51,6 +50,10 @@
     }
     #content {
         margin-left: 250px;
+    }
+    #rate {
+        float: right;
+        font-size: 0.5em
     }
     </style>
 </head>
@@ -117,8 +120,17 @@ function update_avatar(href){
     $("#avatar").attr("src", href);
 };
 function update_rate(){
-    $("#rate").value("999")
-}
+    $.ajax({
+        url: '/rate_limit',
+        method: "GET",
+        success: function(result){
+            var rate_data = JSON.parse(result);
+            remaining = rate_data["resources"]["core"]["remaining"];
+            console.log(remaining);
+            $("#rate").text(remaining)
+        }
+    })
+};
 $(document).ready(function(){
     $.ajax({
         url: '/user',
@@ -142,6 +154,7 @@ $(document).ready(function(){
 
         }
     });
+    update_rate();
 });
 //let user select an organization, then update the list of teams for that
 //organization.
@@ -155,6 +168,7 @@ $(document).on("click", "input:checkbox", function() {
         update_team(id, checked);
         update_repo(id, checked);
     };
+    update_rate()
 });
 </script>
 <div id="sidebar">
@@ -168,7 +182,7 @@ $(document).on("click", "input:checkbox", function() {
     <div align="center"><a href="/logout">logout</a></div>
 </div>
 <div id="content">
-    <p id="rate" style="text-align:right">999</p>
+    <div id="rate">4999</div>
     <h1>Teams</h1>
         <ul id='teams'>
         </ul>
