@@ -42,15 +42,15 @@
         font-size: 1em;
         font-weight: normal;
     }
-    #content {
-        margin-left: 250px;
-    }
     #sidebar div {
     overflow: hidden;
     white-space: nowrap;
     }
     .user_info > img, p{
         display: inline-block;
+    }
+    #content {
+        margin-left: 250px;
     }
     </style>
 </head>
@@ -116,6 +116,9 @@ function update_repo(org, checked){
 function update_avatar(href){
     $("#avatar").attr("src", href);
 };
+function update_rate(){
+    $("#rate").value("999")
+}
 $(document).ready(function(){
     $.ajax({
         url: '/user',
@@ -165,6 +168,7 @@ $(document).on("click", "input:checkbox", function() {
     <div align="center"><a href="/logout">logout</a></div>
 </div>
 <div id="content">
+    <p id="rate" style="text-align:right">999</p>
     <h1>Teams</h1>
         <ul id='teams'>
         </ul>
