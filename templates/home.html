@@ -25,7 +25,7 @@
     ul {
         list-style-type: none;
     }
-    #sidebar {
+    .sidebar {
         position: fixed;
         height: 100%;
         width: 250px;
@@ -34,26 +34,32 @@
         left: 0;
         overflow: scroll;
     }
-    #sidebar select {
+    .sidebar select {
         width: 160px;
         margin: 10px;
         padding: 3px 6px;
         font-size: 1em;
         font-weight: normal;
     }
-    #sidebar div {
+    .sidebar {
     overflow: hidden;
     white-space: nowrap;
     }
-    .user_info > img, p{
+    #user_info img, p{
         display: inline-block;
+    }
+    .sidebar.page_title {
+        font-size: 2.0em;
+    }
+    .sidebar.groupings {
+        font-size: : 2.0em;
     }
     #content {
         margin-left: 250px;
     }
     #rate {
         float: right;
-        font-size: 0.5em
+        font-size: 0.5em;
     }
     </style>
 </head>
@@ -171,24 +177,24 @@ $(document).on("click", "input:checkbox", function() {
     update_rate()
 });
 </script>
-<div id="sidebar">
-    <h1>GitArena</h1>
+<div class="sidebar">
+    <div class="page_title">GitArena</div>
     <div id="user_info">
         <a id="user_link"><img id="avatar" width="36"></img><p id="user" style="font-size:36px"></p></a>
     </div>
-    <h2>Organizations</h2>
+    <div class="groupings">Organizations</div>
     <ul id="orgs" style="padding-left: 20px">
     </ul>
+    <div class="groupings">Teams</div>
+        <ul id="teams">
+        </ul>
+    <div class="groupings">Repositories</div> 
+        <ul id="repos">
+        </ul>
+    <div class="groupings">Labels</div>
+    <div class="groupings">Milestones</div>
+    <div class="groupings">Issues</div>
     <div align="center"><a href="/logout">logout</a></div>
-    <h1>Teams</h1>
-        <ul id='teams'>
-        </ul>
-    <h1>Repositories</h1> 
-        <ul id='repos'>
-        </ul>
-    <h1>Labels</h1>
-    <h1>Milestones</h1>
-    <h1>Issues</h1>
 </div>
 </div>
 <div id="content">
