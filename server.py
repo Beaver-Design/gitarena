@@ -240,7 +240,6 @@ def get_all_issues():
                 all_issues.append(issue)
 
     return render_template('all_issues.html', all_issues = all_issues)
->>>>>>> prototype
 
 if __name__ == '__main__':
     app.run(debug=True)
