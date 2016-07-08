@@ -10,18 +10,9 @@
     body {
         margin: 1em;
         padding: 0;
-        font: 13pt arial, sans-serif;
+        font: 13pt Arial, Helvetica, sans-serif;
         color: #333;
     }
-    h1, h2, h3, h4, h5, h6, p {
-        margin: 0;
-        padding: 0;
-        line-height: 1;
-    }
-    h1, h2, h3, h4, h5, h6 { font-weight: bold; }
-    h1 { font-size: 1.728em; }
-    h2 { font-size: 1.200em; }
-    h3, h4, h5, h6 { font-size: 1.000em; }
     ul {
         list-style-type: none;
     }
@@ -33,26 +24,27 @@
         top: 0;
         left: 0;
         overflow: scroll;
+        white-space: nowrap;
     }
     .sidebar select {
         width: 160px;
         margin: 10px;
         padding: 3px 6px;
-        font-size: 1em;
         font-weight: normal;
     }
-    .sidebar {
-    overflow: hidden;
-    white-space: nowrap;
+    .page_title {
+        font-size: 3.0em;
+        display: inline-block;
+    }
+    .groupings {
+        font-size: 2.0em;
+        margin-left: inherit;
     }
     #user_info img, p{
         display: inline-block;
     }
-    .sidebar.page_title {
-        font-size: 2.0em;
-    }
-    .sidebar.groupings {
-        font-size: : 2.0em;
+    #user {
+        font-size: 36px;
     }
     #content {
         margin-left: 250px;
@@ -180,7 +172,7 @@ $(document).on("click", "input:checkbox", function() {
 <div class="sidebar">
     <div class="page_title">GitArena</div>
     <div id="user_info">
-        <a id="user_link"><img id="avatar" width="36"></img><p id="user" style="font-size:36px"></p></a>
+        <a id="user_link"><img id="avatar" width="36"></img><p id="user"></p></a>
     </div>
     <div class="groupings">Organizations</div>
     <ul id="orgs" style="padding-left: 20px">
