@@ -117,11 +117,14 @@ def user():
     return r.text
 
 @app.route('/orgs')
-def orgs():
+def orgs(return_all = False):
     if not logged_in():
         return redirect('/')    
     r = requests.get(r'https://api.github.com/user/orgs', headers=session['std_header'])
-    return r.text
+    if return_all:
+        return r
+    else:
+        return r.text
 
 @app.route('/orgs/<org>/teams')
 def org_teams(org):
@@ -131,18 +134,24 @@ def org_teams(org):
     return r.text
 
 @app.route('/orgs/<org>/repos')
-def org_repos(org):
+def org_repos(org, return_all=False):
     if not logged_in():
         return redirect('/')
     r = requests.get(r'https://api.github.com/orgs/%s/repos'%org, headers=session['std_header'])
-    return r.text
+    if return_all:
+        return r
+    else:
+        return r.text
 
 @app.route('/repos/<org>/<repo>/issues')
-def org_repo_issues(org, repo):
+def org_repo_issues(org, repo, return_all=False):
     if not logged_in():
         return redirect('/')
     r = requests.get(r'https://api.github.com/repos/%s/%s/issues'%(org, repo), headers=session['std_header'])
-    return r.text
+    if return_all:
+        return r
+    else:
+        return r.text
 
 @app.route('/teams/<team>/repos')
 def team_repos(team):
@@ -186,6 +195,52 @@ def get_milestones_by_orgs():
                     data[title] = {'org': [login], 'repo': [name]}
                 print('  %s'%title)
     return json.dumps(data)
+
+def check_pagination(response):
+    try:
+        #print(response.links)
+        #print(response.headers)
+        return {'last_url': response.links['last']['url']}
+    except KeyError:
+        return False
+
+def get_extra_data(url, last_url):
+    r =  requests.get(url, headers=session['std_header'])
+    if url == last_url:
+        return r.json()
+    else:
+        return r.json() + get_extra_data(r.links['next']['url'], last_url)
+
+def get_all_data(response):
+    response_data = response.json()
+    extra_pages = check_pagination(response)
+    if extra_pages:
+        response_data + get_extra_data(response.links['next']['url'], extra_pages['last_url'])
+    return response_data
+
+@app.route('/all_issues')
+def get_all_issues():
+    all_issues = []
+    org_response = orgs(True)
+    org_data = get_all_data(org_response)
+    for org in org_data:
+        org_login = org['login']
+        #print('Organization: %s'%org_login)
+        repo_response = org_repos(org_login, True)
+        repo_data = get_all_data(repo_response)
+        for repo in repo_data:
+            repo_name = repo['name']
+            #print('   Repository: %s'%repo_name)
+            issue_response = org_repo_issues(org_login, repo_name, True)
+            issue_data = get_all_data(issue_response)
+            for issue in issue_data:
+                #print('      Issue: %s'%issue['title'])
+                issue['org_login'] = org_login
+                issue['repo_name'] = repo_name
+                all_issues.append(issue)
+
+    return render_template('all_issues.html', all_issues = all_issues)
+>>>>>>> prototype
 
 if __name__ == '__main__':
     app.run(debug=True)

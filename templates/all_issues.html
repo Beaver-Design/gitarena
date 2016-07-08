@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- This tells IE to use most modern available mode.
+         THIS LINE MUST COME FIRST IN HEAD SECTION -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8">
+<title>GH Organizer</title>
+</head>
+<body>
+<div class="header">
+    <h1>All Issues</h1>
+</div>
+<div>
+  <input class="search textinput" placeholder="Search Issues"/>
+  <table id= "table">
+    <thead>
+      <tr style="text-align: center;">
+        <th>Org</th>
+        <th>Repo</th>
+        <th>Issue</th>
+      </tr>
+    </thead>
+    <tbody id = "table_id" class = "list">
+      {% for issue in all_issues %}
+      <tr>
+        <td>{{ issue.org_login }}</td>
+        <td>{{ issue.repo_name }}</td>
+        <td><a href="{{ issue.html_url }}">{{ issue.title }}</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
