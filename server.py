@@ -206,6 +206,7 @@ def check_pagination(response):
 
 def get_extra_data(url, last_url):
     r =  requests.get(url, headers=session['std_header'])
+    print('Items returned: %i'%len(r.json()))
     if url == last_url:
         return r.json()
     else:
@@ -215,7 +216,11 @@ def get_all_data(response):
     response_data = response.json()
     extra_pages = check_pagination(response)
     if extra_pages:
-        response_data + get_extra_data(response.links['next']['url'], extra_pages['last_url'])
+        next_url = response.links['next']['url']
+        last_url = extra_pages['last_url']
+        print('Next url: %s'%next_url)
+        print('Last url: %s'%last_url)
+        response_data += get_extra_data(next_url, last_url)
     return response_data
 
 @app.route('/all_issues')
@@ -230,9 +235,10 @@ def get_all_issues():
         repo_data = get_all_data(repo_response)
         for repo in repo_data:
             repo_name = repo['name']
-            #print('   Repository: %s'%repo_name)
+            print('   Repository: %s'%repo_name)
             issue_response = org_repo_issues(org_login, repo_name, True)
             issue_data = get_all_data(issue_response)
+            print('Number of issues found: %i'%len(issue_data))
             for issue in issue_data:
                 #print('      Issue: %s'%issue['title'])
                 issue['org_login'] = org_login
