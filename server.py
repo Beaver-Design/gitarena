@@ -109,6 +109,16 @@ def home():
     data['url_logout'] = url_for('logout')
     return render_template('home.html', data = data)   
 
+###############################################################################
+def get_helper(url, headers=session['std_header'], params={}, return_all=False):
+    if not logged_in():
+        return redirect('/')    
+    r = requests.get(url, headers)
+    if return_all:
+        return r
+    else:
+        return r.text
+
 @app.route('/user')
 def user():
     if not logged_in():
@@ -174,6 +184,23 @@ def get_milestones(owner, repo):
     r = requests.get(r'https://api.github.com/repos/%s/%s/milestones'%(owner, repo), headers=session['std_header'])
     return r.text
 
+@app.route('/search/issues')
+def search_issues(payload, return_all=False):
+    if not logged_in():
+        return redirect('/')
+    r = requests.get(r'https://api.github.com/search/issues', headers=session['std_header'], params=payload)
+    if return_all:
+        return r
+    else:
+        return r.text
+
+def form_search_string(search_params):
+    search_string = 'q='
+    for key in search_params:
+        search_string += key + ':' + search_params[key] + '+'
+    return search_string.rstrip('+')
+
+###############################################################################
 @app.route('/milestones')
 def get_milestones_by_orgs():
     data = {}
