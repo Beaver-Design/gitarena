@@ -110,10 +110,10 @@ def home():
     return render_template('home.html', data = data)   
 
 ###############################################################################
-def get_helper(url, parameters={'per_page': '10'}, return_all=False):
+def get_helper(url, params={'per_page': '100'}, return_all=False):
     if not logged_in():
         return redirect('/')    
-    r = requests.get(url, params=parameters, headers=session['std_header'])
+    r = requests.get(url, params=params, headers=session['std_header'])
     print(url)
     print(r.url)
     if return_all:
@@ -161,23 +161,18 @@ def get_rate_limit():
 
 @app.route('/repos/<owner>/<repo>/milestones')
 def get_milestones(owner, repo):
-    if not logged_in():
-        return redirect('/')
-    r = requests.get(r'https://api.github.com/repos/%s/%s/milestones'%(owner, repo), headers=session['std_header'])
-    return r.text
+    url = form_url('/repos/%s/%s/milestones'%(owner, repo))
+    return get_helper(url)
 
-@app.route('/search/issues')
-def search_issues(payload, return_all=False):
-    if not logged_in():
-        return redirect('/')
-    r = requests.get(r'https://api.github.com/search/issues', headers=session['std_header'], params=payload)
-    if return_all:
-        return r
-    else:
-        return r.text
+@app.route('/search/issues/<org>')
+def search_issues(org, return_all=False):
+    search_string = 'user:%s+state:open'%org
+    params = 'q=%s&per_page=100'%search_string
+    url = form_url('/search/issues')
+    return get_helper(url, return_all=return_all, params=params)
 
 def form_search_string(search_params):
-    search_string = 'q='
+    search_string = ''
     for key in search_params:
         search_string += key + ':' + search_params[key] + '+'
     return search_string.rstrip('+')
