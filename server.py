@@ -110,72 +110,54 @@ def home():
     return render_template('home.html', data = data)   
 
 ###############################################################################
-def get_helper(url, headers=session['std_header'], params={}, return_all=False):
+def get_helper(url, parameters={'per_page': '10'}, return_all=False):
     if not logged_in():
         return redirect('/')    
-    r = requests.get(url, headers)
+    r = requests.get(url, params=parameters, headers=session['std_header'])
+    print(url)
+    print(r.url)
     if return_all:
         return r
     else:
         return r.text
+
+def form_url(endpoint, prefix=r'https://api.github.com'):
+    return prefix + endpoint
 
 @app.route('/user')
 def user():
-    if not logged_in():
-        return redirect('/')
-    r = requests.get(r'https://api.github.com/user', headers=session['std_header'])
-    return r.text
+    url = form_url('/user')
+    return get_helper(url)
 
 @app.route('/orgs')
 def orgs(return_all = False):
-    if not logged_in():
-        return redirect('/')    
-    r = requests.get(r'https://api.github.com/user/orgs', headers=session['std_header'])
-    if return_all:
-        return r
-    else:
-        return r.text
+    url = form_url('/user/orgs')
+    return get_helper(url, return_all=return_all)
 
 @app.route('/orgs/<org>/teams')
 def org_teams(org):
-    if not logged_in():
-        return redirect('/')
-    r = requests.get(r'https://api.github.com/orgs/%s/teams'%org, headers=session['std_header'])
-    return r.text
+    url = form_url('/orgs/%s/teams'%org)
+    return get_helper(url)
 
 @app.route('/orgs/<org>/repos')
 def org_repos(org, return_all=False):
-    if not logged_in():
-        return redirect('/')
-    r = requests.get(r'https://api.github.com/orgs/%s/repos'%org, headers=session['std_header'])
-    if return_all:
-        return r
-    else:
-        return r.text
+    url = form_url('/orgs/%s/repos'%org)
+    return get_helper(url, return_all=return_all)
 
 @app.route('/repos/<org>/<repo>/issues')
 def org_repo_issues(org, repo, return_all=False):
-    if not logged_in():
-        return redirect('/')
-    r = requests.get(r'https://api.github.com/repos/%s/%s/issues'%(org, repo), headers=session['std_header'])
-    if return_all:
-        return r
-    else:
-        return r.text
+    url = form_url('/repos/%s/%s/issues'%(org, repo))
+    return get_helper(url, return_all=return_all)
 
 @app.route('/teams/<team>/repos')
 def team_repos(team):
-    if not logged_in():
-        return redirect('/')
-    r = requests.get(r'https://api.github.com/teams/%s/repos'%(team), headers=session['std_header'])
-    return r.text + str(r.headers)
+    url = form_url('/teams/%s/repos'%(team))
+    return get_helper(url)
 
 @app.route('/rate_limit')
 def get_rate_limit():
-    if not logged_in():
-        return redirect('/')
-    r = requests.get(r'https://api.github.com/rate_limit', headers=session['std_header'])
-    return r.text 
+    url = form_url('/rate_limit')
+    return get_helper(url)
 
 @app.route('/repos/<owner>/<repo>/milestones')
 def get_milestones(owner, repo):
