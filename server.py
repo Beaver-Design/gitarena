@@ -208,23 +208,30 @@ def check_pagination(response):
     except KeyError:
         return False
 
-def get_extra_data(url, last_url):
+def get_extra_data(url, last_url, target = False):
     r =  requests.get(url, headers=session['std_header'])
-    print('Items returned: %i'%len(r.json()))
-    if url == last_url:
-        return r.json()
+    if target:
+        data = r.json()[target]
     else:
-        return r.json() + get_extra_data(r.links['next']['url'], last_url)
+        data = r.json()
+    print('Items returned: %i'%len(data))
+    if url == last_url:
+        return data
+    else:
+        return data + get_extra_data(r.links['next']['url'], last_url, target = target)
 
-def get_all_data(response):
-    response_data = response.json()
+def get_all_data(response, target = False):
+    if target:
+        response_data = response.json()[target]
+    else:
+        response_data = response.json()
     extra_pages = check_pagination(response)
     if extra_pages:
         next_url = response.links['next']['url']
         last_url = extra_pages['last_url']
         print('Next url: %s'%next_url)
         print('Last url: %s'%last_url)
-        response_data += get_extra_data(next_url, last_url)
+        response_data += get_extra_data(next_url, last_url, target = target)
     return response_data
 
 @app.route('/all_issues')
@@ -251,5 +258,26 @@ def get_all_issues():
 
     return render_template('all_issues.html', all_issues = all_issues)
 
+def extract_repo_milestone(issue):
+    return (issue['repository_url'], issue['milestone']['url'])
+
+@app.route('/search_milestones/<org>')
+def search_milestones(org):
+    milestone_issues = []
+    issue_search_response = search_issues(org, True)
+    remaining_searches = issue_search_response.headers['X-RateLimit-Remaining']
+    issue_data = get_all_data(issue_search_response, 'items')
+    for issue in issue_data:
+        milestone = issue['milestone']
+        if milestone:
+            #repo_milestone = extract_repo_milestone(issue)
+            #target_repo_milestones = [extract_repo_milestone(target_issue) for target_issue in milestone_issues]
+            #if repo_milestone in target_repo_milestones:
+            #    continue
+            #else:
+            r = requests.get(issue['repository_url'], headers=session['std_header'])
+            issue['repo_name'] = r.json()['name']
+            milestone_issues.append(issue)
+    return render_template('milestone_issues.html', issues = milestone_issues)
 if __name__ == '__main__':
     app.run(debug=True)
