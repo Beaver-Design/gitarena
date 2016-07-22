@@ -192,6 +192,7 @@ $(document).ready(function(){
         success: function(result){
             milestone_data = JSON.parse(result);
             console.log(milestone_data);
+            update_milestones();
         }
     });
     update_rate();
@@ -229,13 +230,13 @@ $(document).on("click", "input:checkbox", function() {
     <div class="groupings">Teams</div>
         <ul id="teams">
         </ul>
+    <div class="groupings">Milestones</div>
+        <ul id="milestones">
+        </ul>
     <div class="groupings">Repositories</div> 
         <ul id="repos">
         </ul>
     <div class="groupings">Labels</div>
-    <div class="groupings">Milestones</div>
-        <ul id="milestones">
-        </ul>
     <div align="center"><a href="/logout">logout</a></div>
 </div>
 </div>
