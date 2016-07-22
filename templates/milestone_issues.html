@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- This tells IE to use most modern available mode.
-         THIS LINE MUST COME FIRST IN HEAD SECTION -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta charset="utf-8">
 <title>GH Organizer</title>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-<script type="text/javascript" src="http://tablesorter.com/__jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="/static/scripts/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() { 
   $("#myTable").tablesorter({sortList:[[2,0],[0,0]]});
@@ -63,7 +61,7 @@ table.tablesorter thead tr th, table.tablesorter tfoot tr th {
   padding: 4px;
 }
 table.tablesorter thead tr .header {
-  background-image: url('http://tablesorter.com/themes/blue/bg.gif');
+  background-image: url('/static/images/bg.gif');
   background-repeat: no-repeat;
   background-position: center right;
   cursor: pointer;
@@ -78,10 +76,10 @@ table.tablesorter tbody tr.odd td {
   background-color:#F0F0F6;
 }
 table.tablesorter thead tr .headerSortUp {
-  background-image: url('http://tablesorter.com/themes/blue/asc.gif');
+  background-image: url('/static/images/asc.gif');
 }
 table.tablesorter thead tr .headerSortDown {
-  background-image: url('http://tablesorter.com/themes/blue/desc.gif');
+  background-image: url('/static/images/desc.gif');
 }
 table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
 background-color: #8dbdd8;
