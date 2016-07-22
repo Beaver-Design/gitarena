@@ -59,21 +59,35 @@
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script type="text/javascript">
+var milestone_data = false;
 function format_name(name, prefix=""){
-    return prefix + name.split(' ').join('-')
+    return (prefix + name.split(' ').join('-')).replace("'","_")
 };
 function gen_list(list, key, property){
     var htmlText = "";
     for (i = 0; i < list.length; i++) {
         var value=list[i][key]
         var id=list[i]['id']
-        htmlText += '<li id="' + format_name(value, 'li_') + '"">';
+        htmlText += '<li id="' + format_name(value, 'li_') + '">';
         htmlText += '<label id="'+ id + '">';
         htmlText += '<input id ="'+ format_name(value) + '" type="checkbox" itemprop="' + property + '">';
         htmlText += value + '</label></li>';
     };
     return htmlText
 };
+function gen_list2(list, property){
+    var htmlText = "";
+    for (i = 0; i < list.length; i++) {
+        var value=list[i]
+        var id=i
+        htmlText += '<li id="' + format_name(value, 'li_') + '">';
+        htmlText += '<label id="'+ id + '">';
+        htmlText += '<input id ="'+ format_name(value) + '" type="checkbox" itemprop="' + property + '">';
+        htmlText += value + '</label></li>';
+    };
+    return htmlText
+};
+
 function update_inner(id, value) {
     var element = document.getElementById(id);
     element.innerHTML = value;
@@ -129,6 +143,27 @@ function update_rate(){
         }
     })
 };
+function get_keys(dictionary){
+    var keys = [];
+    for (var key in milestone_data) {
+        if (milestone_data.hasOwnProperty(key)) {
+            keys.push(key);
+        }
+    }
+    return keys;
+};
+function update_milestones(){
+    var milestone_names = get_keys(milestone_data);
+    var htmlText = gen_list2(milestone_names, "milestone");
+    for(i = 0; i < milestone_names.length; i++){
+        var id = format_name(milestone_names[i], "li_");
+        console.log(id);
+        if (document.getElementById(id)) {
+            $('#' + id).remove()
+        }
+    };
+    $("#milestones").append(htmlText)
+};
 $(document).ready(function(){
     $.ajax({
         url: '/user',
@@ -149,7 +184,14 @@ $(document).ready(function(){
             console.log(org_data);
             var htmlText=gen_list(org_data, "login", "org");
             $("#orgs").append(htmlText);
-
+        }
+    });
+    $.ajax({
+        url: '/milestones',
+        method: "GET",
+        success: function(result){
+            milestone_data = JSON.parse(result);
+            console.log(milestone_data);
         }
     });
     update_rate();
@@ -166,6 +208,13 @@ $(document).on("click", "input:checkbox", function() {
         update_team(id, checked);
         update_repo(id, checked);
     };
+    if(milestone_data != false){
+        console.log("updating milestones")
+        update_milestones();
+    };
+    if(milestone_data == false){
+        console.log("not updating milestones")
+    }
     update_rate()
 });
 </script>
@@ -185,7 +234,8 @@ $(document).on("click", "input:checkbox", function() {
         </ul>
     <div class="groupings">Labels</div>
     <div class="groupings">Milestones</div>
-    <div class="groupings">Issues</div>
+        <ul id="milestones">
+        </ul>
     <div align="center"><a href="/logout">logout</a></div>
 </div>
 </div>
