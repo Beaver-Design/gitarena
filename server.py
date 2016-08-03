@@ -275,9 +275,15 @@ def search_milestones(org):
             #if repo_milestone in target_repo_milestones:
             #    continue
             #else:
-            r = requests.get(issue['repository_url'], headers=session['std_header'])
-            issue['repo_name'] = r.json()['name']
+            for found_issue in milestone_issues:
+                if issue['repository_url'] in found_issue['repository_url']:
+                    issue['repo_name'] = found_issue['repo_name']
+                    break
+            if 'repo_name' not in issue.keys():
+                r = requests.get(issue['repository_url'], headers=session['std_header'])
+                issue['repo_name'] = r.json()['name']
             milestone_issues.append(issue)
     return render_template('milestone_issues.html', issues = milestone_issues)
+
 if __name__ == '__main__':
     app.run(debug=True)
