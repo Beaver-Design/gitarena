@@ -101,7 +101,7 @@ def authorized():
         session['access_token'] = r.json()['access_token']
         session['std_header'] = gen_header(session['access_token'])
         session['logged_in'] = True
-        return redirect(url_for('home'))
+        return redirect('/')
 
 @app.route('/control_room')
 def home():
