@@ -34,6 +34,10 @@ def logged_in(session = session):
 def form_git_authorize_url(base = git_authorize_url, id = GITHUB_CLIENT_ID, session = session, scope = 'read:org%20repo'):
     url = '%s?client_id=%s&state=%s&scope=%s'%(base, id, session['state'], scope)
     return url
+
+def redirect_if_unauthenticated():
+    if not logged_in():
+        return redirect('/')
 ###############################################################################
 @app.before_first_request
 def set_github_access_token():
@@ -59,7 +63,6 @@ def index():
         t = 'Hello! <a href="{{ url_for("login") }}">Login</a>'
         for key in session:
             t = t + '<p>%s: %s</p>'%(key, session[key])
-
     return render_template_string(t)
 
 @app.route('/login')
@@ -255,7 +258,6 @@ def get_all_issues():
                 issue['org_login'] = org_login
                 issue['repo_name'] = repo_name
                 all_issues.append(issue)
-
     return render_template('all_issues.html', all_issues = all_issues)
 
 def extract_repo_milestone(issue):
@@ -263,6 +265,8 @@ def extract_repo_milestone(issue):
 
 @app.route('/search_milestones/<org>')
 def search_milestones(org):
+    if not logged_in():
+        return redirect('/')
     milestone_issues = []
     issue_search_response = search_issues(org, True)
     remaining_searches = issue_search_response.headers['X-RateLimit-Remaining']
@@ -270,11 +274,6 @@ def search_milestones(org):
     for issue in issue_data:
         milestone = issue['milestone']
         if milestone:
-            #repo_milestone = extract_repo_milestone(issue)
-            #target_repo_milestones = [extract_repo_milestone(target_issue) for target_issue in milestone_issues]
-            #if repo_milestone in target_repo_milestones:
-            #    continue
-            #else:
             for found_issue in milestone_issues:
                 if issue['repository_url'] in found_issue['repository_url']:
                     issue['repo_name'] = found_issue['repo_name']
