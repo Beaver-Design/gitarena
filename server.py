@@ -56,7 +56,7 @@ def index():
     if logged_in():
         t = '<p>Hello, you are logged in.</p>'\
             '<p><a href="{{ url_for("home") }}">Control Room</a></p>'\
-            '<p><a href="/search_milestones/NPDSoftwareDev">Search for Milestones</a></p>'
+            '<p><a href="{{ url_for("search_milestones") }}">Search for Milestones</a></p>'
     else:
         t = 'Hello! <a href="{{ url_for("login") }}">Login</a>'
         for key in session:
@@ -261,10 +261,13 @@ def get_all_issues():
 def extract_repo_milestone(issue):
     return (issue['repository_url'], issue['milestone']['url'])
 
+@app.route('/search_milestones/')
 @app.route('/search_milestones/<org>')
-def search_milestones(org):
+def search_milestones(org = None):
     if not logged_in():
         return redirect('/')
+    if org == None:
+        return render_template('milestone_issues.html', issues = [])
     milestone_issues = []
     issue_search_response = search_issues(org, True)
     remaining_searches = issue_search_response.headers['X-RateLimit-Remaining']
