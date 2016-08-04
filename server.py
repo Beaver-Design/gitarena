@@ -54,11 +54,9 @@ def set_github_access_token():
 @app.route('/')
 def index():
     if logged_in():
-        t = '<p>Hello, you are logged in, but we have not asked GitHub who you are.</p>'\
-            '<a href="{{ url_for("logout") }}">Logout</a>'\
-            '<p>Below are the session variables.'
-        for key in session:
-            t = t + '<p>%s: %s</p>'%(key, session[key])
+        t = '<p>Hello, you are logged in.</p>'\
+            '<p><a href="{{ url_for("home") }}">Control Room</a></p>'\
+            '<p><a href="/search_milestones/NPDSoftwareDev">Search for Milestones</a></p>'
     else:
         t = 'Hello! <a href="{{ url_for("login") }}">Login</a>'
         for key in session:
