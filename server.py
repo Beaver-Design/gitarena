@@ -261,13 +261,17 @@ def get_all_issues():
 def extract_repo_milestone(issue):
     return (issue['repository_url'], issue['milestone']['url'])
 
-@app.route('/search_milestones/')
+@app.route('/search_milestones')
+def mileston_view():
+    if logged_in():
+        return render_template('milestone_issues.html', issues = [])
+    else:
+        return redirect('/')
+
 @app.route('/search_milestones/<org>')
-def search_milestones(org = None):
+def search_milestones(org, return_all=False):
     if not logged_in():
         return redirect('/')
-    if org == None:
-        return render_template('milestone_issues.html', issues = [])
     milestone_issues = []
     issue_search_response = search_issues(org, True)
     remaining_searches = issue_search_response.headers['X-RateLimit-Remaining']
@@ -283,7 +287,10 @@ def search_milestones(org = None):
                 r = requests.get(issue['repository_url'], headers=session['std_header'])
                 issue['repo_name'] = r.json()['name']
             milestone_issues.append(issue)
-    return render_template('milestone_issues.html', issues = milestone_issues)
+    if return_all:
+        return milestone_issues
+    else:
+        return json.dumps(milestone_issues)
 
 if __name__ == '__main__':
     app.run(debug=True)

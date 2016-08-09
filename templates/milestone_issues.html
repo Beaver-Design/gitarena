@@ -85,27 +85,117 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
 background-color: #8dbdd8;
 }
 </style>
+<script type="text/javascript">
+var milestone_data = false;
+function format_name(name, prefix=""){
+    return (prefix + name.split(' ').join('-')).replace("'","_")
+};
+function gen_list(list, key, property, tag="option"){
+    var htmlText = "";
+    for (i = 0; i < list.length; i++) {
+        var value=list[i][key]
+        var id=list[i]['id']
+        htmlText += '<' + tag + ' id="' + format_name(value) + '" value=' + format_name(value) + '>';
+        htmlText += value + '</' + tag + '>';
+    };
+    return htmlText
+};
+function gen_issue_list(data, tag='td'){
+    var htmlText = "";
+    for (i = 0; i < data.length; i++) {
+        var repo_name=data[i]['repo_name']
+        var repo_url=data[i]['repository_url']
+        var milestone_title=data[i]['milestone']['title']
+        var milestone_url=data[i]['milestone']['html_url']
+        var issue_title=data[i]['title']
+        var issue_url=data[i]['html_url']
+        htmlText += '<tr>'
+        htmlText += '<' + tag + '>' + repo_name + '</' + tag + '>';
+        htmlText += '<' + tag + '><a href="' + milestone_url + '">' + milestone_title + '</a></' + tag + '>';
+        htmlText += '<' + tag + '><a href="' + issue_url + '">' + issue_title + '</a></' + tag + '>';
+        htmlText += '</tr>'
+    };
+    return htmlText
+};
+function update_inner(id, value) {
+    var element = document.getElementById(id);
+    element.innerHTML = value;
+};
+function update_avatar(href){
+    $("#avatar").attr("src", href);
+};
+function update_rate(){
+    $.ajax({
+        url: '/rate_limit',
+        method: "GET",
+        success: function(result){
+            var rate_data = JSON.parse(result);
+            remaining = rate_data["resources"]["core"]["remaining"];
+            console.log(remaining);
+            $("#rate").text(remaining)
+        }
+    })
+};
+function get_keys(dictionary){
+    var keys = [];
+    for (var key in milestone_data) {
+        if (milestone_data.hasOwnProperty(key)) {
+            keys.push(key);
+        }
+    }
+    return keys;
+};
+$(document).ready(function(){
+    $.ajax({
+        url: '/orgs',
+        method: "GET",
+        success: function(result){
+            var org_data = JSON.parse(result);
+            console.log(org_data);
+            var htmlText=gen_list(org_data, "login", "org");
+            $("#select_org").append(htmlText);
+        }
+    });
+    //update_rate();
+});
+//let user select an organization, then update the list of milestons for that
+//organization.
+$(function() {
+  $('#select_org').change(function() {
+    var org=$(this).val();
+    console.log("organization selected: " + org);
+    $.ajax({
+      url: '/search_milestones/' + org,
+      method: "GET",
+      success: function(result){
+        var issue_data = JSON.parse(result);
+        console.log(issue_data.length + " issue(s) found.");
+        update_inner("table_body", gen_issue_list(issue_data))
+      }
+    });
+    update_rate()
+  });
+});
+</script>
 <body>
 <div class="header">
     <h1>Milestone Issues</h1>
+</div>
+<div>
+  <select id="select_org">
+    <option id="placeholder" value="placeholder" selected>Select Organization</option>
+  </select>
 </div>
 <div>
   <table id= "myTable" class="tablesorter">
     <thead>
       <tr>
         <th>Repo</th>
-        <th>Issue</th>
         <th>Milestone</th>
+        <th>Issue</th>
       </tr>
     </thead>
-    <tbody>
-      {% for issue in issues %}
-      <tr>
-        <td>{{ issue.repo_name }}</td>
-        <td><a href="{{ issue.html_url }}">{{ issue.title }}</a></td>
-        <td><a href="{{ issue.milestone.html_url }}">{{ issue.milestone.title }}</a></td>
-      </tr>
-      {% endfor %}
+    <tbody id="table_body">
     </tbody>
   </table>
 </div>
