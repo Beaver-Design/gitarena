@@ -5,85 +5,13 @@
 <meta charset="utf-8">
 <title>GH Organizer</title>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-<script type="text/javascript" src="/static/scripts/jquery.tablesorter.min.js"></script>
-<script type="text/javascript">
-$(document).ready(function() { 
-  $("#myTable").tablesorter({sortList:[[2,0],[0,0]]});
-}); 
-</script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css"></link>
 <style type="text/css">
 body,div,h1{font-family:'trebuchet ms', verdana, arial;margin:0;padding:0;}
 body{background-color:#fff;color:#333;font-size:small;margin:0;padding:0;}
 h1{font-size:large;font-weight:400;margin:0;}
 h2{color:#333;font-size:small;font-weight:400;margin:0;}
-pre{background-color:#eee;border:1px solid #ddd;border-left-width:5px;color:#333;font-size:small;overflow-x:auto;padding:15px;}
-pre.normal{background-color:transparent;border:none;border-left-width:0;overflow-x:auto;}
-#external{margin: 20px;}
-#logo{background:url(images/jq.png);display:block;float:right;height:31px;margin-right:10px;margin-top:10px;width:110px;}
-#main{margin:0px 25px 0px 40px;padding:0 15px 15px 0;}
-#content{padding:20px;}
-#busy{background-color:#e95555;border:1px ridge #ccc;color:#eee;display:none;padding:3px;position:absolute;right:7px;top:7px;}
-hr{height:1px;}
-code{font-size:108%;font-style:normal;padding:0;}
-ul{color:#333;list-style:square;}
-#banner{margin:40px;margin-bottom: 0px;padding-bottom:10px;text-align:left;}
-#banner *{color:#232121;font-family:Georgia, Palatino, Times New Roman;font-size:30px;font-style:normal;font-weight:400;margin:0;padding:0;}
-#banner h1{display:block;float:left;}
-#banner h1 em{color:#6cf;}
-#banner h2{float:right;font-size:26px;margin:10px 10px -10px -10px;}
-#banner h3{clear:both;display:block;font-size:12px;margin-top:-20px;}
-#banner a{border-top:1px solid #888;display:block;font-size:14px;margin:5px 0 0;padding:10px 0 0;text-align:right;width:auto;}
-a.external{background-image:url(../img/external.png);background-position:center right;background-repeat:no-repeat;padding-right:12px;}
-form{font-size:10pt;margin-bottom:20px;width:auto;}
-form fieldset{padding:10px;text-align:left;width:140px;}
-div#main h1{border-bottom:1px solid #CDCDCD;display:block;margin-top:20px;padding:10px 0 2px;}
-table#tablesorter-demo {margin: 10px 0 0 0;}
-table#options *{font-size:small;}
-p.tip em {padding: 2px; background-color: #6cf; color: #FFF;}
-p.tip.update em {background-color: #FF0000;}
-div.digg {float: right; margin-left: 20px;}
-#skyscraper {float: right; margin-right: 0px; margin-left: 20px; background: #EEE; padding: 20px;}
-#skyscraper > div { margin-bottom: 20px; }
-#skyscraper.wide { float: none; overflow: hidden; margin-left: 0; text-align: center;}
-#skyscraper.wide > div { display: inline-block; margin-right: 20px;  margin-bottom: 0;}
-table.tablesorter {
-  font-family:arial;
-  background-color: #CDCDCD;
-  margin:10px 0pt 15px;
-  font-size: 8pt;
-  width: 100%;
-  text-align: left;
-}
-table.tablesorter thead tr th, table.tablesorter tfoot tr th {
-  background-color: #e6EEEE;
-  border: 1px solid #FFF;
-  font-size: 8pt;
-  padding: 4px;
-}
-table.tablesorter thead tr .header {
-  background-image: url('/static/images/bg.gif');
-  background-repeat: no-repeat;
-  background-position: center right;
-  cursor: pointer;
-}
-table.tablesorter tbody td {
-  color: #3D3D3D;
-  padding: 4px;
-  background-color: #FFF;
-  vertical-align: top;
-}
-table.tablesorter tbody tr.odd td {
-  background-color:#F0F0F6;
-}
-table.tablesorter thead tr .headerSortUp {
-  background-image: url('/static/images/asc.gif');
-}
-table.tablesorter thead tr .headerSortDown {
-  background-image: url('/static/images/desc.gif');
-}
-table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
-background-color: #8dbdd8;
-}
 </style>
 <script type="text/javascript">
 var milestone_data = false;
@@ -145,6 +73,16 @@ function get_keys(dictionary){
     }
     return keys;
 };
+function update_table(dataset, column_names){
+  var formatted_column_names = [];
+  for (var name in column_names) {
+    formatted_column_names.push({ title: name})
+  };
+  $('#myTable').DataTable( {
+    data: dataset,
+    columns: formatted_column_names
+  })
+};
 $(document).ready(function(){
     $.ajax({
         url: '/orgs',
@@ -170,12 +108,13 @@ $(function() {
       success: function(result){
         var issue_data = JSON.parse(result);
         console.log(issue_data.length + " issue(s) found.");
-        update_inner("table_body", gen_issue_list(issue_data))
+        update_table([["a","b","c"],["d","e","f"]], ["1","2","3"])
       }
     });
     update_rate()
   });
 });
+// Repo Milesone Issue
 </script>
 <body>
 <div class="header">
@@ -187,17 +126,7 @@ $(function() {
   </select>
 </div>
 <div>
-  <table id= "myTable" class="tablesorter">
-    <thead>
-      <tr>
-        <th>Repo</th>
-        <th>Milestone</th>
-        <th>Issue</th>
-      </tr>
-    </thead>
-    <tbody id="table_body">
-    </tbody>
-  </table>
+  <table id="myTable" class="display" width="80%"></table>
 </div>
 </body>
 </html>
